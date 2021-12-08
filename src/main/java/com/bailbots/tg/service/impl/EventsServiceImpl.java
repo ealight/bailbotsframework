@@ -122,8 +122,9 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 60 * 1000 * 15)
+    @Scheduled(fixedRate = 60 * 1000 * 1)
     public void eventsNotification() {
+        log.info("Events notifications worked {}", new Date());
         eventRepository.findAll().stream()
                 .filter(event -> event.getDate().getTime() - 60 * 1000 * 60 <= new Date().getTime())
                 .filter(event -> !event.getNotification())
