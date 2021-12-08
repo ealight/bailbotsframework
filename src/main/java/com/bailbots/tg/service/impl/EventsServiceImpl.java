@@ -122,15 +122,11 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-    @Scheduled(fixedRate = 60 * 1000 * 1)
+    @Scheduled(fixedRate = 60 * 1000 * 15)
     public void eventsNotification() {
         log.info("Events notifications worked {}", new Date());
         eventRepository.findAll().stream()
-                .forEach(event -> {
-                    log.info("{}", event.getDate().getTime() - 60 * 1000 * 60 <= new Date().getTime());
-                    log.info("{} | {} - {} | {}", new Date(), new Date().getTime(), event.getDate(), event.getDate().getTime());
-                });
-             /*   .filter(event -> event.getDate().getTime() - 60 * 1000 * 60 <= new Date().getTime())
+                .filter(event -> event.getDate().getTime() - 60 * 1000 * 60 <= new Date().getTime())
                 .filter(event -> !event.getNotification())
                 .forEach(event -> {
                             long dateDiff = event.getDate().getTime() - new Date().getTime();
@@ -156,7 +152,7 @@ public class EventsServiceImpl implements EventsService {
 
                             log.info("Notification: {} | Time: {} | Time diff: {}", event.getName(), event.getDate(), diff);
                         }
-                );*/
+                );
     }
 
     @Override
