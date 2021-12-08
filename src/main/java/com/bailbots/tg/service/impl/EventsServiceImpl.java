@@ -117,7 +117,7 @@ public class EventsServiceImpl implements EventsService {
     @Scheduled(fixedRate = 60 * 1000 * 15)
     public void eventsNotification() {
         eventRepository.findAll().stream()
-                .filter(event -> event.getDate().getTime() >= new Date().getTime() - 60 * 1000 * 60)
+                .filter(event -> event.getDate().getTime() <= new Date().getTime() - 60 * 1000 * 60)
                 .filter(event -> !event.getNotification())
                 .forEach(event -> {
                             long dateDiff = stringTimeToDate(event.getTime()).getTime() - new Date().getTime();
