@@ -4,8 +4,11 @@
                  xsi:noNamespaceSchemaLocation="../../xsd/staticKeyboard.xsd">
 
     <static-keyrow>
-        <static-button>Информация о Славске</static-button>
-        <static-button>Выбрать дом</static-button>
+        <static-button>Івенти сьогодні</static-button>
+        <static-button>Всі івенти</static-button>
+    </static-keyrow>
+    <static-keyrow>
+        <static-button>Додати івент</static-button>
     </static-keyrow>
 
 </static-keyboard>
