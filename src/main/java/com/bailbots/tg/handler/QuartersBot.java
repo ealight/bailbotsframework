@@ -32,8 +32,6 @@ public class QuartersBot extends TelegramLongPollingBot {
         }
 
         BotSelectHandle.processByUpdate(update);
-
-        System.out.println(telegramId);
     }
 
     @Override
