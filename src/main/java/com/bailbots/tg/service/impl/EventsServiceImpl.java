@@ -49,78 +49,89 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public void addEvent(Update update) {
         Long chatId = update.getMessage().getChatId();
-        User user = update.getMessage().getFrom();
-        Date currentDate = new Date();
 
-        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
-        List<Optional<String>> args = pattern.matcher(update.getMessage().getText()).results()
-                .map(matchResult -> Optional.of(matchResult.group(1)))
-                .collect(Collectors.toList());
+        try {
+            User user = update.getMessage().getFrom();
+            Date currentDate = new Date();
 
-        String name = args.get(0).orElse("");
-        Optional<String> time = args.get(1);
-        String date = args.size() == 2 ? "" : args.get(2).orElse("");
+            Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+            List<Optional<String>> args = pattern.matcher(update.getMessage().getText()).results()
+                    .map(matchResult -> Optional.of(matchResult.group(1)))
+                    .collect(Collectors.toList());
 
-        if (!time.isPresent()) {
-            messageService.sendMessage("Ти не написав час", chatId);
-            return;
-        }
+            String name = args.get(0).orElse("");
+            Optional<String> time = args.get(1);
+            String date = args.size() == 2 ? "" : args.get(2).orElse("");
 
-        if (!time.get().matches("\\d{0,2}:\\d{0,2}")) {
-            messageService.sendMessage("Час в форматі hh:mm", chatId);
-            return;
-        }
-
-        if (stringTimeToDate(time.get()).getTime() - new Date().getTime() < 0 && date.isEmpty()) {
-            messageService.sendMessage("На вчора плануєш?", chatId);
-            return;
-        }
-
-        Event event = Event.builder()
-                .name(name)
-                .time(time.get())
-                .notification(false)
-                .date(currentDate)
-                .authorFirstName(user.getFirstName())
-                .authorLastName(user.getLastName())
-                .build();
-
-        if (!date.isEmpty()) {
-            Date parsedDate = new SimpleDateFormat("dd.MM.yyyy").parse(date);
-
-            if (parsedDate.before(currentDate)) {
-                messageService.sendMessage("Ти на коли дату поставив??", chatId);
+            if (!time.isPresent()) {
+                messageService.sendMessage("Ти не написав час", chatId);
                 return;
             }
 
-            event.setDate(parsedDate);
+            if (!time.get().matches("\\d{0,2}:\\d{0,2}")) {
+                messageService.sendMessage("Час в форматі hh:mm", chatId);
+                return;
+            }
+
+            Date dateTime = stringTimeToDate(time.get());
+
+            if (dateTime.getTime() - currentDate.getTime() < 0 && date.isEmpty()) {
+                messageService.sendMessage("На вчора плануєш?", chatId);
+                return;
+            }
+
+            Event event = Event.builder()
+                    .name(name)
+                    .time(time.get())
+                    .notification(false)
+                    .date(dateTime)
+                    .authorFirstName(user.getFirstName())
+                    .authorLastName(user.getLastName())
+                    .build();
+
+            if (!date.isEmpty()) {
+                Date parsedDate = new SimpleDateFormat("dd.MM.yyyy").parse(date);
+
+                if (parsedDate.before(currentDate)) {
+                    messageService.sendMessage("Ти на коли дату поставив??", chatId);
+                    return;
+                }
+
+                event.setDate(parsedDate);
+            }
+
+            eventRepository.save(event);
+
+            messageService.sendMessage(String.format("%s зробив(ла \uD83D\uDC60) подію %s",
+                    event.getAuthorFirstName(), event.getName()), chatId);
+        } catch (Exception e) {
+            messageService.sendMessage("Щось пішло не так, я не можу додати івент \uD83D\uDE30" +
+                    "\nПопробуй в форматі /addEvent [Назва] [Час] [Дата] (якшо на сьогодні, дату не пиши)", chatId);
         }
-
-        eventRepository.save(event);
-
-        messageService.sendMessage(String.format("%s зробив(ла \uD83D\uDC60) подію %s",
-                event.getAuthorFirstName(), event.getName()), chatId);
     }
 
     @Override
     public List<Event> getAllEventsToday() {
         return eventRepository.findAllByOrderByDateAsc().stream()
                 .filter(event -> event.getDate().getDay() == new Date().getDay())
+                .filter(event -> event.getDate().after(new Date()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Event> getAllEvents() {
-        return eventRepository.findAllByOrderByDateAsc();
+        return eventRepository.findAllByOrderByDateAsc().stream()
+                .filter(event -> event.getDate().after(new Date()))
+                .collect(Collectors.toList());
     }
 
     @Scheduled(fixedRate = 60 * 1000 * 15)
     public void eventsNotification() {
         eventRepository.findAll().stream()
-                .filter(event -> event.getDate().getTime() <= new Date().getTime() - 60 * 1000 * 60)
+                .filter(event -> event.getDate().getTime() - 60 * 1000 * 60 <= new Date().getTime())
                 .filter(event -> !event.getNotification())
                 .forEach(event -> {
-                            long dateDiff = stringTimeToDate(event.getTime()).getTime() - new Date().getTime();
+                            long dateDiff = event.getDate().getTime() - new Date().getTime();
                             String diff = new SimpleDateFormat("mm").format(new Date(dateDiff));
 
                             messageService.sendMessage(
@@ -177,6 +188,7 @@ public class EventsServiceImpl implements EventsService {
         String[] splitTime = time.split(":");
         date.setHours(Integer.parseInt(splitTime[0]));
         date.setMinutes(Integer.parseInt(splitTime[1]));
+        date.setSeconds(0);
         return date;
     }
 }
