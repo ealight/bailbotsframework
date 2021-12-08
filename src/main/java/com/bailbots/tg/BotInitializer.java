@@ -11,7 +11,6 @@ import java.util.Date;
 public class BotInitializer {
 
 	public static void main(String[] args) {
-		System.out.println(new Date());
 		SpringApplication.run(BotInitializer.class, args);
 	}
 

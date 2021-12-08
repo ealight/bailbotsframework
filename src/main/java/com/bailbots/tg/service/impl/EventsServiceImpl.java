@@ -148,6 +148,8 @@ public class EventsServiceImpl implements EventsService {
                             } catch (TelegramApiException e) {
                                 log.debug(e.getMessage());
                             }
+
+                            log.info("Notification: {} | Time: {} | Time diff: {}", event.getName(), event.getDate(), diff);
                         }
                 );
     }
