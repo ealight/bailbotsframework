@@ -84,10 +84,11 @@ public class KeyboardLoaderServiceImpl implements KeyboardLoaderService {
                 List<InlineKeyboardButton> keyboardRow = new ArrayList<>();
 
                 for (InlineButton button : keyrow.getButtons()) {
-                    keyboardRow.add(new InlineKeyboardButton(button.getText())
-                            .setCallbackData(inlineKeyboard.getController() + "/"
-                                    + button.getCallback() + "/"
-                                    + itemId[0]));
+                    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton(button.getText());
+                    inlineKeyboardButton.setCallbackData(inlineKeyboard.getController() + "/"
+                            + button.getCallback() + "/"
+                            + itemId[0]);
+                    keyboardRow.add(inlineKeyboardButton);
                 }
 
                 keyboardRows.add(keyboardRow);
@@ -121,12 +122,12 @@ public class KeyboardLoaderServiceImpl implements KeyboardLoaderService {
                 Method callbackMethod = clazz.getMethod(keyrow.getMethodForCallback());
 
                 for (Object object : keyboardObjectRepository.getObjectListByEntity(clazz, page, maxItemsOnPage)) {
-                    keyboardRows.add(Collections.singletonList(
-                            new InlineKeyboardButton(nameMethod.invoke(object).toString())
-                                    .setCallbackData(inlineKeyboard.getController() + "/"
-                                            + "GetItem" + "/"
-                                            + keyrow.getEntity() + "/"
-                                            + callbackMethod.invoke(object).toString())));
+                    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton(nameMethod.invoke(object).toString());
+                    inlineKeyboardButton.setCallbackData(inlineKeyboard.getController() + "/"
+                            + "GetItem" + "/"
+                            + keyrow.getEntity() + "/"
+                            + callbackMethod.invoke(object).toString());
+                    keyboardRows.add(Collections.singletonList(inlineKeyboardButton));
                 }
             }
         }
@@ -153,8 +154,9 @@ public class KeyboardLoaderServiceImpl implements KeyboardLoaderService {
                                     + button.getCallback());
                         }
                     }
-                    keyboardRow.add(new InlineKeyboardButton(button.getText())
-                            .setCallbackData(button.getCallback()));
+                    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton(button.getText());
+                    inlineKeyboardButton.setCallbackData(button.getCallback());
+                    keyboardRow.add(inlineKeyboardButton);
                 }
 
                 keyboardRows.add(keyboardRow);
