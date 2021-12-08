@@ -55,7 +55,7 @@ public class BotConfiguration {
             connection.disconnect();
             log.info("Verify webhook {}, Response code {}", url.getHost(), connection.getResponseCode());
         } catch (IOException e) {
-            log.error("Ping FAILED");
+            log.error("Failed to verify webhook");
         }
     }
 }
