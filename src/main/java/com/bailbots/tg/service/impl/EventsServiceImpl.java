@@ -70,7 +70,7 @@ public class EventsServiceImpl implements EventsService {
                 return;
             }
 
-            Date dateTime = stringTimeToDate(time.get());
+            Date dateTime = stringTimeToDate(new Date(), time.get());
 
             if (dateTime.getTime() - currentDate.getTime() < 0 && date.isEmpty()) {
                 messageService.sendMessage("На вчора плануєш?", chatId);
@@ -94,7 +94,7 @@ public class EventsServiceImpl implements EventsService {
                     return;
                 }
 
-                event.setDate(parsedDate);
+                event.setDate(stringTimeToDate(parsedDate, time.get()));
             }
 
             eventRepository.save(event);
@@ -183,8 +183,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @SneakyThrows
-    private Date stringTimeToDate(String time) {
-        Date date = new Date();
+    private Date stringTimeToDate(Date date, String time) {
         String[] splitTime = time.split(":");
         date.setHours(Integer.parseInt(splitTime[0]));
         date.setMinutes(Integer.parseInt(splitTime[1]));
