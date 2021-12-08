@@ -7,9 +7,7 @@ import com.bailbots.tg.repository.StickerRepository;
 import com.bailbots.tg.service.EventsService;
 import com.bailbots.tg.service.MessageService;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,9 +24,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class EventsServiceImpl implements EventsService {
-    private final Logger LOGGER = LogManager.getLogger(this.getClass());
-
     @Value("${weekend}")
     private String weekendTime;
 
@@ -149,7 +146,7 @@ public class EventsServiceImpl implements EventsService {
                                         Long.valueOf(botConfiguration.getGroupId())
                                 );
                             } catch (TelegramApiException e) {
-                                LOGGER.log(Level.DEBUG, e.getMessage());
+                                log.debug(e.getMessage());
                             }
                         }
                 );
@@ -168,7 +165,7 @@ public class EventsServiceImpl implements EventsService {
                     Long.valueOf(botConfiguration.getGroupId())
             );
         } catch (TelegramApiException e) {
-            LOGGER.log(Level.DEBUG, e.getMessage());
+            log.debug(e.getMessage());
         }
     }
 

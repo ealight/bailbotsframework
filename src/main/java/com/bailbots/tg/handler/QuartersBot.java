@@ -15,8 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.starter.SpringWebhookBot;
 
 public class QuartersBot extends SpringWebhookBot {
-    private static final Logger LOGGER = LogManager.getLogger(QuartersBot.class);
-
     private final BotConfiguration botConfiguration;
 
     public QuartersBot(BotConfiguration botConfiguration, DefaultBotOptions options, SetWebhook setWebhook) {
