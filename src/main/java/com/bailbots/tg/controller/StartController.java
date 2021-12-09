@@ -4,6 +4,7 @@ import com.bailbots.tg.bpp.annotation.BotController;
 import com.bailbots.tg.bpp.annotation.BotRequestMapping;
 import com.bailbots.tg.model.Event;
 import com.bailbots.tg.model.Sticker;
+import com.bailbots.tg.repository.EventRepository;
 import com.bailbots.tg.repository.StickerRepository;
 import com.bailbots.tg.service.EventsService;
 import com.bailbots.tg.service.KeyboardLoaderService;
@@ -18,6 +19,7 @@ import java.util.Random;
 public class StartController {
     private static final String START_COMMAND = "/start";
     private static final String ADD_EVENT_COMMAND = "/add";
+    private static final String DELETE_EVENT_COMMAND = "/delete";
     private static final String ALL_EVENTS_COMMAND = "/all";
     private static final String EVENTS_TODAY_COMMAND = "/today";
     private static final String ADD_STICKER_COMMAND = "/addsticker";
@@ -27,12 +29,14 @@ public class StartController {
     private final MessageService messageService;
     private final KeyboardLoaderService keyboardLoaderService;
     private final EventsService eventsService;
+    private final EventRepository eventRepository;
     private final StickerRepository stickerRepository;
 
-    public StartController(MessageService messageService, KeyboardLoaderService keyboardLoaderService, EventsService eventsService, StickerRepository stickerRepository) {
+    public StartController(MessageService messageService, KeyboardLoaderService keyboardLoaderService, EventsService eventsService, EventRepository eventRepository, StickerRepository stickerRepository) {
         this.messageService = messageService;
         this.keyboardLoaderService = keyboardLoaderService;
         this.eventsService = eventsService;
+        this.eventRepository = eventRepository;
         this.stickerRepository = stickerRepository;
     }
 
@@ -51,6 +55,18 @@ public class StartController {
     @BotRequestMapping(ADD_EVENT_COMMAND)
     public void choseHouse(Update update) {
         eventsService.addEvent(update);
+    }
+
+    @BotRequestMapping(DELETE_EVENT_COMMAND)
+    public void removeEvent(Update update) {
+        Long chatId = update.getMessage().getChatId();
+        String text = update.getMessage().getText();
+        String id = text.substring(text.indexOf(DELETE_EVENT_COMMAND) + DELETE_EVENT_COMMAND.length());
+
+        Optional<Event> event = eventRepository.findById(Long.valueOf(id));
+
+        event.ifPresentOrElse(eventRepository::delete, () -> messageService.sendMessage(
+                String.format("Стікера з ID %s не існує", id), chatId));
     }
 
     @BotRequestMapping(ALL_EVENTS_COMMAND)
@@ -76,7 +92,7 @@ public class StartController {
     @BotRequestMapping("Додати івент")
     public void addEvent(Update update) {
         Long chatId = update.getMessage().getChatId();
-        messageService.sendMessage("Введіть: /add [Назва] [Час, пр: 14:00] [Дата, пр: 22.09.2005]", chatId);
+        messageService.sendMessage("Введіть: /add \"Назва\" \"Час, пр: 14:00\" \"Дата, пр: 22.09.2005\"", chatId);
     }
 
     @BotRequestMapping(WEEKEND_COMMAND)

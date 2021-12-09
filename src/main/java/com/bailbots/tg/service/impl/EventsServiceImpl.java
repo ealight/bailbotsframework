@@ -51,7 +51,7 @@ public class EventsServiceImpl implements EventsService {
             User user = update.getMessage().getFrom();
             Date currentDate = new Date();
 
-            Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+            Pattern pattern = Pattern.compile("\"(.*?)\"");
             List<Optional<String>> args = pattern.matcher(update.getMessage().getText()).results()
                     .map(matchResult -> Optional.of(matchResult.group(1)))
                     .collect(Collectors.toList());
@@ -103,7 +103,7 @@ public class EventsServiceImpl implements EventsService {
                     event.getAuthorFirstName(), event.getName()), chatId);
         } catch (Exception e) {
             messageService.sendMessage("Щось пішло не так, я не можу додати івент \uD83D\uDE30" +
-                    "\nПопробуй в форматі /add [Назва] [Час] [Дата] (якшо на сьогодні, дату не пиши)", chatId);
+                    "\nПопробуй в форматі /add \"Назва\" \"Час\" \"Дата\" (якшо на сьогодні, дату не пиши)", chatId);
         }
     }
 
