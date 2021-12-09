@@ -21,6 +21,6 @@ public class Sticker {
 
     @Override
     public String toString() {
-        return "ID: " + id + " | URL: " + url;
+        return "ID: " + id + " | URL: " + url + "\n";
     }
 }
