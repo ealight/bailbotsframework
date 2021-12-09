@@ -103,7 +103,7 @@ public class EventsServiceImpl implements EventsService {
                     event.getAuthorFirstName(), event.getName()), chatId);
         } catch (Exception e) {
             messageService.sendMessage("Щось пішло не так, я не можу додати івент \uD83D\uDE30" +
-                    "\nПопробуй в форматі /addEvent [Назва] [Час] [Дата] (якшо на сьогодні, дату не пиши)", chatId);
+                    "\nПопробуй в форматі /add [Назва] [Час] [Дата] (якшо на сьогодні, дату не пиши)", chatId);
         }
     }
 

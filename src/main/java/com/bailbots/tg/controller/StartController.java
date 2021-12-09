@@ -16,6 +16,10 @@ import java.util.Random;
 
 @BotController
 public class StartController {
+    private static final String START_COMMAND = "/start";
+    private static final String ADD_EVENT_COMMAND = "/add";
+    private static final String ALL_EVENTS_COMMAND = "/all";
+    private static final String EVENTS_TODAY_COMMAND = "/today";
     private static final String ADD_STICKER_COMMAND = "/addsticker";
     private static final String DELETE_STICKER_COMMAND = "/removesticker";
     private static final String WEEKEND_COMMAND = "/weekend";
@@ -32,8 +36,7 @@ public class StartController {
         this.stickerRepository = stickerRepository;
     }
 
-
-    @BotRequestMapping("/start")
+    @BotRequestMapping(START_COMMAND)
     public void start(Update update) {
         Long telegramId = update.getMessage().getChatId();
         Random rand = new Random();
@@ -45,24 +48,24 @@ public class StartController {
                 keyboardLoaderService.getStaticKeyboardFromXML("start"), telegramId);
     }
 
-    @BotRequestMapping("/add")
+    @BotRequestMapping(ADD_EVENT_COMMAND)
     public void choseHouse(Update update) {
         eventsService.addEvent(update);
     }
 
-    @BotRequestMapping("/all")
+    @BotRequestMapping(ALL_EVENTS_COMMAND)
     public void allEvents(Update update) {
         showEvents(update, eventsService.getAllEvents());
+    }
+
+    @BotRequestMapping(EVENTS_TODAY_COMMAND)
+    public void today(Update update) {
+        showEvents(update, eventsService.getAllEventsToday());
     }
 
     @BotRequestMapping("Всі івенти")
     public void allEventsText(Update update) {
         showEvents(update, eventsService.getAllEvents());
-    }
-
-    @BotRequestMapping("/today")
-    public void today(Update update) {
-        showEvents(update, eventsService.getAllEventsToday());
     }
 
     @BotRequestMapping("Івенти сьогодні")
@@ -73,7 +76,7 @@ public class StartController {
     @BotRequestMapping("Додати івент")
     public void addEvent(Update update) {
         Long chatId = update.getMessage().getChatId();
-        messageService.sendMessage("Введіть: /addEvent [Назва] [Час, пр: 14:00] [Дата, пр: 22.09.2005]", chatId);
+        messageService.sendMessage("Введіть: /add [Назва] [Час, пр: 14:00] [Дата, пр: 22.09.2005]", chatId);
     }
 
     @BotRequestMapping(WEEKEND_COMMAND)
