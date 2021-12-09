@@ -18,4 +18,9 @@ public class Sticker {
 
     @Column
     private String url;
+
+    @Override
+    public String toString() {
+        return "ID: " + id + " | URL: " + url;
+    }
 }

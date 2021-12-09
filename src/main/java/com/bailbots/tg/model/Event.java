@@ -42,7 +42,7 @@ public class Event {
         String date = (new Date().getDay() == this.date.getDay()) ? "Сьогодні" :
                 new SimpleDateFormat("dd/MM/yyyy").format(this.date);
 
-        return  "========== " + name + " ==========\n" +
+        return  "========== " + name +" (" + id + ")" + " ==========\n" +
                 "Автор: " + authorFirstName + " " + authorLastName + '\n' +
                 "Дата: " + date + "\n" +
                 "Час: " + time + "\n\n";

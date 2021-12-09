@@ -24,6 +24,7 @@ public class StartController {
     private static final String EVENTS_TODAY_COMMAND = "/today";
     private static final String ADD_STICKER_COMMAND = "/addsticker";
     private static final String DELETE_STICKER_COMMAND = "/removesticker";
+    private static final String ALL_STICKERS_COMMAND = "/stickers";
     private static final String WEEKEND_COMMAND = "/weekend";
 
     private final MessageService messageService;
@@ -63,10 +64,10 @@ public class StartController {
         String text = update.getMessage().getText();
         String id = text.substring(text.indexOf(DELETE_EVENT_COMMAND) + DELETE_EVENT_COMMAND.length());
 
-        Optional<Event> event = eventRepository.findById(Long.valueOf(id));
+        Optional<Event> event = eventRepository.findById(Long.valueOf(id.trim()));
 
         event.ifPresentOrElse(eventRepository::delete, () -> messageService.sendMessage(
-                String.format("Стікера з ID %s не існує", id), chatId));
+                String.format("Івента з ID %s не існує", id), chatId));
     }
 
     @BotRequestMapping(ALL_EVENTS_COMMAND)
@@ -120,11 +121,21 @@ public class StartController {
                 .url(url)
                 .build();
 
-        stickerRepository.save(sticker);
+        Sticker addedSticker = stickerRepository.save(sticker);
 
         messageService.sendMessage(String.format(
-                "Новий стікер додано: ID: %s | URL: %s", sticker.getId(), sticker.getUrl()
+                "Новий стікер додано: ID: %s | URL: %s", addedSticker.getId(), addedSticker.getUrl()
         ), chatId);
+    }
+
+    @BotRequestMapping(ALL_STICKERS_COMMAND)
+    public void allStickers(Update update) {
+        Long chatId = update.getMessage().getChatId();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stickerRepository.findAll().forEach(s -> stringBuilder.append(s.toString()));
+
+        messageService.sendMessage(stringBuilder.toString(), chatId);
     }
 
     @BotRequestMapping(DELETE_STICKER_COMMAND)
@@ -133,7 +144,7 @@ public class StartController {
         String text = update.getMessage().getText();
         String id = text.substring(text.indexOf(DELETE_STICKER_COMMAND) + DELETE_STICKER_COMMAND.length());
 
-        Optional<Sticker> sticker = stickerRepository.findById(Long.valueOf(id));
+        Optional<Sticker> sticker = stickerRepository.findById(Long.valueOf(id.trim()));
 
         sticker.ifPresentOrElse(stickerRepository::delete, () -> messageService.sendMessage(
                 String.format("Стікера з ID %s не існує", id), chatId));
